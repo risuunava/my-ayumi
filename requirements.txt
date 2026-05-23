@@ -1,5 +1,6 @@
 SpeechRecognition
-pyttsx3
+gTTS
+pygame
 wikipedia
 pyaudio
 pyautogui

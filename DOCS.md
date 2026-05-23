@@ -91,6 +91,7 @@ Dokumen ini berisi daftar lengkap semua perintah suara yang dapat digunakan deng
 | `tutup tab` / `close tab` | *"Ayumi tutup tab"* | Menutup tab aktif di browser |
 | `pindah tab` / `tab selanjutnya` | *"Ayumi pindah tab"* | Beralih ke tab berikutnya |
 | `pindah jendela` / `switch window` | *"Ayumi pindah jendela"* | Beralih ke jendela lain (Alt+Tab) |
+| `tutup semua aplikasi` / `close all` | *"Ayumi tutup semua aplikasi"* | Menutup semua jendela aplikasi yang terbuka (Kecuali Ayumi) |
 
 ---
 
@@ -98,7 +99,7 @@ Dokumen ini berisi daftar lengkap semua perintah suara yang dapat digunakan deng
 
 | Perintah | Contoh | Keterangan |
 |---|---|---|
-| `screenshot` / `tangkap layar` | *"Ayumi screenshot"* | Mengambil tangkapan layar dan menyimpannya di `Pictures/Ayumi Screenshots/` |
+| `screenshot` / `tangkap layar` | *"Ayumi screenshot"* | Mengambil tangkapan layar dan menyimpannya di `C:\\Users\\ADVAN R5 6600H\\OneDrive\\Ayumi Screenshots` |
 
 ---
 

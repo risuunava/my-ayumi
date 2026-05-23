@@ -372,6 +372,18 @@ class AyumiAssistant(tk.Tk):
             self.speak("Membuka Google Maps")
             webbrowser.open("https://maps.google.com")
 
+        elif "buka supabase" in command:
+            self.speak("Membuka Supabase")
+            webbrowser.open("https://supabase.com/dashboard")
+
+        elif "buka railway" in command:
+            self.speak("Membuka Railway")
+            webbrowser.open("https://railway.com/dashboard")
+
+        elif "buka vercel" in command:
+            self.speak("Membuka Vercel")
+            webbrowser.open("https://vercel.com/")
+
         # ── Buka Aplikasi Windows ──
 
         elif "buka notepad" in command:
@@ -402,6 +414,10 @@ class AyumiAssistant(tk.Tk):
             self.speak("Membuka Paint")
             subprocess.Popen("mspaint.exe")
 
+        elif "buka anti gravity" in command or "buka kode editor" in command or "buka antigravity" in command:
+            self.speak("Membuka Antigravity")
+            subprocess.Popen([r"D:\Antigravity IDE\Antigravity IDE.exe"])
+
         # ── Kontrol Jendela ──
 
         elif "minimize" in command or "kecilkan jendela" in command:
@@ -430,17 +446,22 @@ class AyumiAssistant(tk.Tk):
         elif "pindah jendela" in command or "switch window" in command:
             pyautogui.hotkey("alt", "Tab")
 
+        elif "tutup semua aplikasi" in command or "close all" in command:
+            self.speak("Menutup semua aplikasi yang terbuka.")
+            ps_cmd = 'Get-Process | Where-Object { $_.MainWindowHandle -ne 0 -and $_.ProcessName -notmatch "explorer|python|pythonw|cmd|conhost|WindowsTerminal" } | Stop-Process -Force'
+            subprocess.Popen(["powershell", "-Command", ps_cmd], creationflags=subprocess.CREATE_NO_WINDOW)
+
         # ── Screenshot ──
 
         elif "screenshot" in command or "tangkap layar" in command:
             self.speak("Mengambil screenshot")
-            screenshot_dir = os.path.join(os.path.expanduser("~"), "Pictures", "Ayumi Screenshots")
+            screenshot_dir = r"C:\Users\ADVAN R5 6600H\OneDrive\Ayumi Screenshots"
             os.makedirs(screenshot_dir, exist_ok=True)
             filename = datetime.datetime.now().strftime("screenshot_%Y%m%d_%H%M%S.png")
             filepath = os.path.join(screenshot_dir, filename)
             img = pyautogui.screenshot()
             img.save(filepath)
-            self.speak(f"Screenshot disimpan di folder Pictures")
+            self.speak(f"Screenshot disimpan di folder OneDrive")
 
         # ── Kontrol Sistem ──
 

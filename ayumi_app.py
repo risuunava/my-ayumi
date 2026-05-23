@@ -13,6 +13,8 @@ import winsound
 import pyautogui
 import urllib.request
 import re
+import subprocess
+import random
 
 # Setup Wikipedia language
 wikipedia.set_lang("id")
@@ -233,6 +235,9 @@ class AyumiAssistant(tk.Tk):
     # ── Command Processor ────────────────────────────────────
 
     def process_command(self, command):
+
+        # ── Informasi & Pengetahuan ──
+
         if command.startswith("wikipedia"):
             topic = command.replace("wikipedia", "").strip()
             if topic:
@@ -248,6 +253,31 @@ class AyumiAssistant(tk.Tk):
             else:
                 self.speak("Silakan sebutkan topik yang ingin dicari di Wikipedia.")
 
+        elif command.startswith("cari di google"):
+            query = command.replace("cari di google", "").strip()
+            if query:
+                self.speak(f"Mencari {query} di Google")
+                webbrowser.open(f"https://www.google.com/search?q={query.replace(' ', '+')}")
+            else:
+                self.speak("Apa yang ingin dicari di Google?")
+
+        # ── Waktu & Tanggal ──
+
+        elif "jam berapa" in command or "waktu sekarang" in command:
+            now = datetime.datetime.now().strftime("%H:%M")
+            self.speak(f"Sekarang jam {now}")
+
+        elif "tanggal berapa" in command or "tanggal hari ini" in command:
+            today = datetime.datetime.now().strftime("%d %B %Y")
+            self.speak(f"Hari ini tanggal {today}")
+
+        elif "hari apa" in command or "hari ini apa" in command:
+            hari = ["Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"]
+            today = hari[datetime.datetime.now().weekday()]
+            self.speak(f"Hari ini hari {today}")
+
+        # ── YouTube ──
+
         elif command.startswith("cari di youtube"):
             search_query = command.replace("cari di youtube", "").strip()
             if search_query:
@@ -256,8 +286,8 @@ class AyumiAssistant(tk.Tk):
             else:
                 self.speak("Video apa yang ingin dicari di YouTube?")
 
-        elif command.startswith("putar video"):
-            search_query = command.replace("putar video", "").strip()
+        elif command.startswith("putar video") or command.startswith("play"):
+            search_query = command.replace("putar video", "").replace("play", "").strip()
             if search_query:
                 self.speak(f"Memutar {search_query} di YouTube")
                 try:
@@ -272,13 +302,31 @@ class AyumiAssistant(tk.Tk):
             else:
                 self.speak("Video apa yang ingin diputar?")
 
-        elif "jeda video" in command or "lanjutkan video" in command:
+        elif "jeda video" in command or "pause" in command or "lanjutkan video" in command or "resume" in command:
             self.speak("Oke")
             pyautogui.press("space")
 
-        elif "layar penuh" in command or "keluar layar penuh" in command:
+        elif "layar penuh" in command or "fullscreen" in command or "keluar layar penuh" in command:
             self.speak("Siap")
             pyautogui.press("f")
+
+        # ── Kontrol Volume ──
+
+        elif "volume naik" in command or "kerasin" in command or "lebih keras" in command:
+            self.speak("Menaikkan volume")
+            for _ in range(5):
+                pyautogui.press("volumeup")
+
+        elif "volume turun" in command or "kecilin" in command or "lebih pelan" in command:
+            self.speak("Menurunkan volume")
+            for _ in range(5):
+                pyautogui.press("volumedown")
+
+        elif "mute" in command or "bisukan" in command or "diam" in command:
+            self.speak("Volume dibisukan")
+            pyautogui.press("volumemute")
+
+        # ── Buka Website ──
 
         elif "buka youtube" in command:
             self.speak("Membuka YouTube")
@@ -292,20 +340,206 @@ class AyumiAssistant(tk.Tk):
             self.speak("Membuka ChatGPT")
             webbrowser.open("https://chat.openai.com")
 
-        elif "jam berapa" in command or "waktu" in command:
-            now = datetime.datetime.now().strftime("%H:%M")
-            self.speak(f"Sekarang jam {now}")
+        elif "buka github" in command:
+            self.speak("Membuka GitHub")
+            webbrowser.open("https://github.com")
 
-        elif "tanggal berapa" in command:
-            today = datetime.datetime.now().strftime("%d %B %Y")
-            self.speak(f"Hari ini tanggal {today}")
+        elif "buka gmail" in command or "buka email" in command:
+            self.speak("Membuka Gmail")
+            webbrowser.open("https://mail.google.com")
+
+        elif "buka whatsapp" in command:
+            self.speak("Membuka WhatsApp Web")
+            webbrowser.open("https://web.whatsapp.com")
+
+        elif "buka instagram" in command:
+            self.speak("Membuka Instagram")
+            webbrowser.open("https://www.instagram.com")
+
+        elif "buka twitter" in command or "buka x" in command:
+            self.speak("Membuka X")
+            webbrowser.open("https://x.com")
+
+        elif "buka tiktok" in command:
+            self.speak("Membuka TikTok")
+            webbrowser.open("https://www.tiktok.com")
+
+        elif "buka spotify" in command:
+            self.speak("Membuka Spotify")
+            webbrowser.open("https://open.spotify.com")
+
+        elif "buka maps" in command or "buka peta" in command:
+            self.speak("Membuka Google Maps")
+            webbrowser.open("https://maps.google.com")
+
+        # ── Buka Aplikasi Windows ──
+
+        elif "buka notepad" in command:
+            self.speak("Membuka Notepad")
+            subprocess.Popen("notepad.exe")
+
+        elif "buka kalkulator" in command or "buka calculator" in command:
+            self.speak("Membuka Kalkulator")
+            subprocess.Popen("calc.exe")
+
+        elif "buka file explorer" in command or "buka explorer" in command:
+            self.speak("Membuka File Explorer")
+            subprocess.Popen("explorer.exe")
+
+        elif "buka task manager" in command:
+            self.speak("Membuka Task Manager")
+            subprocess.Popen("taskmgr.exe")
+
+        elif "buka command prompt" in command or "buka cmd" in command:
+            self.speak("Membuka Command Prompt")
+            subprocess.Popen("cmd.exe")
+
+        elif "buka pengaturan" in command or "buka settings" in command:
+            self.speak("Membuka Pengaturan Windows")
+            subprocess.Popen("start ms-settings:", shell=True)
+
+        elif "buka paint" in command:
+            self.speak("Membuka Paint")
+            subprocess.Popen("mspaint.exe")
+
+        # ── Kontrol Jendela ──
+
+        elif "minimize" in command or "kecilkan jendela" in command:
+            self.speak("Oke")
+            pyautogui.hotkey("win", "down")
+
+        elif "maximize" in command or "besarkan jendela" in command:
+            self.speak("Oke")
+            pyautogui.hotkey("win", "up")
+
+        elif "tutup jendela" in command or "close window" in command:
+            self.speak("Menutup jendela")
+            pyautogui.hotkey("alt", "F4")
+
+        elif "tab baru" in command or "new tab" in command:
+            self.speak("Membuka tab baru")
+            pyautogui.hotkey("ctrl", "t")
+
+        elif "tutup tab" in command or "close tab" in command:
+            self.speak("Menutup tab")
+            pyautogui.hotkey("ctrl", "w")
+
+        elif "pindah tab" in command or "tab selanjutnya" in command:
+            pyautogui.hotkey("ctrl", "Tab")
+
+        elif "pindah jendela" in command or "switch window" in command:
+            pyautogui.hotkey("alt", "Tab")
+
+        # ── Screenshot ──
+
+        elif "screenshot" in command or "tangkap layar" in command:
+            self.speak("Mengambil screenshot")
+            screenshot_dir = os.path.join(os.path.expanduser("~"), "Pictures", "Ayumi Screenshots")
+            os.makedirs(screenshot_dir, exist_ok=True)
+            filename = datetime.datetime.now().strftime("screenshot_%Y%m%d_%H%M%S.png")
+            filepath = os.path.join(screenshot_dir, filename)
+            img = pyautogui.screenshot()
+            img.save(filepath)
+            self.speak(f"Screenshot disimpan di folder Pictures")
+
+        # ── Kontrol Sistem ──
+
+        elif "kunci layar" in command or "lock" in command:
+            self.speak("Mengunci layar")
+            subprocess.Popen("rundll32.exe user32.dll,LockWorkStation")
+
+        elif "matikan komputer" in command or "shutdown" in command:
+            self.speak("Komputer akan dimatikan dalam 30 detik. Katakan batalkan shutdown untuk membatalkan.")
+            subprocess.Popen("shutdown /s /t 30", shell=True)
+
+        elif "restart komputer" in command or "restart" == command.strip():
+            self.speak("Komputer akan restart dalam 30 detik. Katakan batalkan shutdown untuk membatalkan.")
+            subprocess.Popen("shutdown /r /t 30", shell=True)
+
+        elif "batalkan shutdown" in command or "cancel shutdown" in command:
+            subprocess.Popen("shutdown /a", shell=True)
+            self.speak("Shutdown dibatalkan.")
+
+        elif "sleep" in command or "tidurkan komputer" in command:
+            self.speak("Komputer akan masuk mode tidur")
+            subprocess.Popen("rundll32.exe powrprof.dll,SetSuspendState 0,1,0")
+
+        # ── Interaksi & Sapaan ──
+
+        elif "siapa kamu" in command or "kamu siapa" in command:
+            self.speak("Saya Ayumi, asisten suara pribadi Anda. Saya siap membantu Anda kapan saja.")
+
+        elif "siapa yang buat kamu" in command or "siapa pembuatmu" in command:
+            self.speak("Saya dibuat oleh pemilik saya sebagai asisten suara pribadi berbahasa Indonesia.")
+
+        elif "apa kabar" in command:
+            respon = random.choice([
+                "Saya baik, terima kasih sudah bertanya!",
+                "Selalu siap membantu Anda!",
+                "Kabar saya baik. Ada yang bisa saya bantu?",
+            ])
+            self.speak(respon)
+
+        elif "terima kasih" in command or "makasih" in command:
+            respon = random.choice([
+                "Sama-sama!",
+                "Senang bisa membantu!",
+                "Dengan senang hati!",
+            ])
+            self.speak(respon)
+
+        elif "selamat pagi" in command:
+            self.speak("Selamat pagi! Semoga harimu menyenangkan.")
+
+        elif "selamat siang" in command:
+            self.speak("Selamat siang! Sudah makan siang belum?")
+
+        elif "selamat sore" in command:
+            self.speak("Selamat sore! Semoga sorenya menyenangkan.")
+
+        elif "selamat malam" in command:
+            self.speak("Selamat malam! Jangan lupa istirahat ya.")
+
+        elif "ceritakan lelucon" in command or "cerita lucu" in command or "bercanda" in command:
+            lelucon = random.choice([
+                "Kenapa ayam menyeberang jalan? Karena belum ada ojek online.",
+                "Apa bedanya kamu sama kalender? Kalender selalu punya tanggal, kamu belum tentu.",
+                "Kenapa matematika itu sedih? Karena banyak masalah.",
+                "Apa nama ikan yang paling asin? Ikan gosip, karena suka nyebar garam.",
+                "Kenapa semut tidak pernah sakit? Karena mereka punya anti-body kecil.",
+            ])
+            self.speak(lelucon)
+
+        elif "motivasi" in command or "semangat" in command:
+            motivasi = random.choice([
+                "Percayalah pada prosesnya. Setiap langkah kecil membawamu lebih dekat ke tujuan.",
+                "Kegagalan bukan akhir, tapi awal dari pembelajaran yang lebih baik.",
+                "Kamu lebih kuat dari yang kamu kira. Terus maju!",
+                "Hari ini mungkin sulit, tapi besok akan lebih baik. Semangat!",
+            ])
+            self.speak(motivasi)
+
+        # ── Bantuan ──
+
+        elif "bantuan" in command or "help" in command or "bisa apa" in command:
+            self.speak(
+                "Saya bisa membantu Anda dengan banyak hal. "
+                "Misalnya: buka aplikasi, cari di Google atau YouTube, putar video, "
+                "mengambil screenshot, mengontrol volume, "
+                "memberitahu waktu dan tanggal, "
+                "atau sekadar mengobrol. "
+                "Awali setiap perintah dengan nama saya, Ayumi."
+            )
+
+        # ── Keluar ──
 
         elif "keluar" in command or "tutup program" in command:
             self.speak("Selamat tinggal!")
             self.running = False
             self.after(2000, self.destroy)
+
         else:
-            self.speak("Maaf, saya belum mengerti perintah tersebut.")
+            self.speak("Maaf, saya belum mengerti perintah tersebut. Katakan 'bantuan' untuk melihat apa yang bisa saya lakukan.")
 
     # ── Cleanup ──────────────────────────────────────────────
 

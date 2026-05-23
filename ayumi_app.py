@@ -234,7 +234,74 @@ class AyumiAssistant(tk.Tk):
 
     # ── Command Processor ────────────────────────────────────
 
+    # Kamus normalisasi typo — speech recognition sering salah dengar
+    TYPO_MAP = {
+        # Supabase
+        "softbase": "supabase", "sofabase": "supabase", "superbased": "supabase",
+        "super base": "supabase", "supa base": "supabase", "sofbes": "supabase",
+        "sopbase": "supabase", "supabas": "supabase", "supabet": "supabase",
+        # Railway
+        "rel way": "railway", "rail way": "railway", "relway": "railway",
+        "relay": "railway", "reel way": "railway", "railwai": "railway",
+        # Vercel
+        "versel": "vercel", "vessel": "vercel", "versatile": "vercel",
+        "versol": "vercel", "versal": "vercel", "farcel": "vercel",
+        # GitHub
+        "git hub": "github", "get hub": "github", "githab": "github",
+        "gethub": "github", "kit hub": "github", "githup": "github",
+        # ChatGPT
+        "chat gpt": "chatgpt", "chatgbt": "chatgpt", "chatjpt": "chatgpt",
+        "chat jpt": "chatgpt", "jet gpt": "chatgpt", "chatgipty": "chatgpt",
+        "chat gpd": "chatgpt", "setgpt": "chatgpt", "cet gpt": "chatgpt",
+        # YouTube
+        "you tube": "youtube", "yu tub": "youtube", "yutub": "youtube",
+        "yutube": "youtube", "u tube": "youtube",
+        # WhatsApp
+        "whats app": "whatsapp", "what sapp": "whatsapp", "watsap": "whatsapp",
+        "wasap": "whatsapp", "what's app": "whatsapp", "wat sap": "whatsapp",
+        # Instagram
+        "insta gram": "instagram", "instagrem": "instagram", "instegram": "instagram",
+        # TikTok
+        "tik tok": "tiktok", "tiktak": "tiktok", "tic tok": "tiktok",
+        # Spotify
+        "spot ify": "spotify", "spotifai": "spotify", "spotifi": "spotify",
+        # Notepad
+        "note pad": "notepad", "not pad": "notepad", "no pad": "notepad",
+        # Kalkulator
+        "calculator": "kalkulator", "kalkuletor": "kalkulator",
+        # Explorer
+        "file eksplorer": "file explorer", "file explor": "file explorer",
+        # Task Manager
+        "tesk manager": "task manager", "task manajer": "task manager",
+        "taskmanager": "task manager",
+        # Command Prompt
+        "command promt": "command prompt", "comand prompt": "command prompt",
+        # Screenshot
+        "screen shot": "screenshot", "skrinshot": "screenshot",
+        "skrin shot": "screenshot", "screensjot": "screenshot",
+        # Antigravity
+        "anti gravity": "antigravity", "anti graviti": "antigravity",
+        "anti grafiti": "antigravity",
+        # PowerShell
+        "power shell": "powershell", "power sel": "powershell",
+        "powersell": "powershell",
+        # Google
+        "gugel": "google", "googel": "google",
+        # Wikipedia
+        "wiki pedia": "wikipedia", "wikipdia": "wikipedia",
+    }
+
+    @staticmethod
+    def normalize_typos(text):
+        """Ganti typo yang sering muncul dari speech recognition."""
+        # Urutkan dari yang terpanjang dulu agar multi-word match duluan
+        for typo, correct in sorted(AyumiAssistant.TYPO_MAP.items(), key=lambda x: -len(x[0])):
+            text = text.replace(typo, correct)
+        return text
+
     def process_command(self, command):
+        # Normalisasi typo sebelum proses perintah
+        command = self.normalize_typos(command)
 
         # ── Informasi & Pengetahuan ──
 
@@ -349,8 +416,21 @@ class AyumiAssistant(tk.Tk):
             webbrowser.open("https://mail.google.com")
 
         elif "buka whatsapp" in command:
-            self.speak("Membuka WhatsApp Web")
-            webbrowser.open("https://web.whatsapp.com")
+            self.speak("Membuka WhatsApp")
+            try:
+                subprocess.Popen(["cmd", "/c", "start", "whatsapp:"], creationflags=subprocess.CREATE_NO_WINDOW)
+            except Exception:
+                # Fallback: coba lewat shell URI atau lokasi umum
+                try:
+                    app_path = os.path.expandvars(
+                        r"%LOCALAPPDATA%\WhatsApp\WhatsApp.exe"
+                    )
+                    if os.path.exists(app_path):
+                        subprocess.Popen([app_path])
+                    else:
+                        subprocess.Popen(["cmd", "/c", "start", "whatsapp:"], creationflags=subprocess.CREATE_NO_WINDOW)
+                except Exception:
+                    self.speak("Gagal membuka WhatsApp. Pastikan aplikasi sudah terinstal.")
 
         elif "buka instagram" in command:
             self.speak("Membuka Instagram")
@@ -384,6 +464,48 @@ class AyumiAssistant(tk.Tk):
             self.speak("Membuka Vercel")
             webbrowser.open("https://vercel.com/")
 
+        elif "buka notion" in command:
+            self.speak("Membuka Notion")
+            webbrowser.open("https://www.notion.so")
+
+        elif "buka figma" in command:
+            self.speak("Membuka Figma")
+            webbrowser.open("https://www.figma.com")
+
+        elif "buka drive" in command or "buka google drive" in command:
+            self.speak("Membuka Google Drive")
+            webbrowser.open("https://drive.google.com")
+
+        elif "buka canva" in command:
+            self.speak("Membuka Canva")
+            webbrowser.open("https://www.canva.com")
+
+        elif "buka linkedin" in command:
+            self.speak("Membuka LinkedIn")
+            webbrowser.open("https://www.linkedin.com")
+
+        elif "buka reddit" in command:
+            self.speak("Membuka Reddit")
+            webbrowser.open("https://www.reddit.com")
+
+        elif "buka discord" in command:
+            self.speak("Membuka Discord")
+            try:
+                discord_path = os.path.expandvars(r"%LOCALAPPDATA%\Discord\Update.exe")
+                if os.path.exists(discord_path):
+                    subprocess.Popen([discord_path, "--processStart", "Discord.exe"])
+                else:
+                    webbrowser.open("https://discord.com/app")
+            except Exception:
+                webbrowser.open("https://discord.com/app")
+
+        elif "buka telegram" in command:
+            self.speak("Membuka Telegram")
+            try:
+                subprocess.Popen(["cmd", "/c", "start", "tg:"], creationflags=subprocess.CREATE_NO_WINDOW)
+            except Exception:
+                webbrowser.open("https://web.telegram.org")
+
         # ── Buka Aplikasi Windows ──
 
         elif "buka notepad" in command:
@@ -406,6 +528,10 @@ class AyumiAssistant(tk.Tk):
             self.speak("Membuka Command Prompt")
             subprocess.Popen("cmd.exe")
 
+        elif "buka powershell" in command:
+            self.speak("Membuka PowerShell")
+            subprocess.Popen("powershell.exe")
+
         elif "buka pengaturan" in command or "buka settings" in command:
             self.speak("Membuka Pengaturan Windows")
             subprocess.Popen("start ms-settings:", shell=True)
@@ -414,9 +540,133 @@ class AyumiAssistant(tk.Tk):
             self.speak("Membuka Paint")
             subprocess.Popen("mspaint.exe")
 
-        elif "buka anti gravity" in command or "buka kode editor" in command or "buka antigravity" in command:
+        elif "buka snipping" in command or "buka snip" in command:
+            self.speak("Membuka Snipping Tool")
+            subprocess.Popen("SnippingTool.exe", shell=True)
+
+        elif "buka word" in command:
+            self.speak("Membuka Microsoft Word")
+            try:
+                subprocess.Popen("start winword", shell=True)
+            except Exception:
+                self.speak("Microsoft Word tidak ditemukan.")
+
+        elif "buka excel" in command:
+            self.speak("Membuka Microsoft Excel")
+            try:
+                subprocess.Popen("start excel", shell=True)
+            except Exception:
+                self.speak("Microsoft Excel tidak ditemukan.")
+
+        elif "buka powerpoint" in command or "buka ppt" in command:
+            self.speak("Membuka Microsoft PowerPoint")
+            try:
+                subprocess.Popen("start powerpnt", shell=True)
+            except Exception:
+                self.speak("Microsoft PowerPoint tidak ditemukan.")
+
+        elif "buka antigravity" in command or "buka kode editor" in command:
             self.speak("Membuka Antigravity")
             subprocess.Popen([r"D:\Antigravity IDE\Antigravity IDE.exe"])
+
+        elif "buka recycle bin" in command or "buka tempat sampah" in command:
+            self.speak("Membuka Recycle Bin")
+            subprocess.Popen("explorer.exe shell:RecycleBinFolder")
+
+        elif "buka download" in command or "buka folder download" in command:
+            self.speak("Membuka folder Download")
+            download_path = os.path.expanduser("~\\Downloads")
+            subprocess.Popen(["explorer.exe", download_path])
+
+        elif "buka dokumen" in command or "buka folder dokumen" in command:
+            self.speak("Membuka folder Dokumen")
+            doc_path = os.path.expanduser("~\\Documents")
+            subprocess.Popen(["explorer.exe", doc_path])
+
+        elif "buka desktop" in command or "buka folder desktop" in command:
+            self.speak("Membuka folder Desktop")
+            desk_path = os.path.expanduser("~\\Desktop")
+            subprocess.Popen(["explorer.exe", desk_path])
+
+        # ── Tutup Aplikasi ──
+
+        elif "tutup notepad" in command or "close notepad" in command:
+            self.speak("Menutup Notepad")
+            subprocess.Popen(["taskkill", "/F", "/IM", "notepad.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup kalkulator" in command or "tutup calculator" in command or "close kalkulator" in command:
+            self.speak("Menutup Kalkulator")
+            subprocess.Popen(["taskkill", "/F", "/IM", "CalculatorApp.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup task manager" in command or "close task manager" in command:
+            self.speak("Menutup Task Manager")
+            subprocess.Popen(["taskkill", "/F", "/IM", "Taskmgr.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup command prompt" in command or "tutup cmd" in command or "close cmd" in command:
+            self.speak("Menutup Command Prompt")
+            subprocess.Popen(["taskkill", "/F", "/IM", "cmd.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup powershell" in command or "close powershell" in command:
+            self.speak("Menutup PowerShell")
+            subprocess.Popen(["taskkill", "/F", "/IM", "powershell.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup paint" in command or "close paint" in command:
+            self.speak("Menutup Paint")
+            subprocess.Popen(["taskkill", "/F", "/IM", "mspaint.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup word" in command or "close word" in command:
+            self.speak("Menutup Microsoft Word")
+            subprocess.Popen(["taskkill", "/F", "/IM", "WINWORD.EXE"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup excel" in command or "close excel" in command:
+            self.speak("Menutup Microsoft Excel")
+            subprocess.Popen(["taskkill", "/F", "/IM", "EXCEL.EXE"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup powerpoint" in command or "tutup ppt" in command or "close powerpoint" in command:
+            self.speak("Menutup Microsoft PowerPoint")
+            subprocess.Popen(["taskkill", "/F", "/IM", "POWERPNT.EXE"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup explorer" in command or "close explorer" in command:
+            self.speak("Menutup File Explorer")
+            subprocess.Popen(["taskkill", "/F", "/IM", "explorer.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+            # Restart explorer agar taskbar tetap jalan
+            subprocess.Popen("explorer.exe")
+
+        elif "tutup whatsapp" in command or "close whatsapp" in command:
+            self.speak("Menutup WhatsApp")
+            subprocess.Popen(["taskkill", "/F", "/IM", "WhatsApp.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup discord" in command or "close discord" in command:
+            self.speak("Menutup Discord")
+            subprocess.Popen(["taskkill", "/F", "/IM", "Discord.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup telegram" in command or "close telegram" in command:
+            self.speak("Menutup Telegram")
+            subprocess.Popen(["taskkill", "/F", "/IM", "Telegram.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup spotify" in command or "close spotify" in command:
+            self.speak("Menutup Spotify")
+            subprocess.Popen(["taskkill", "/F", "/IM", "Spotify.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup chrome" in command or "close chrome" in command:
+            self.speak("Menutup Google Chrome")
+            subprocess.Popen(["taskkill", "/F", "/IM", "chrome.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup firefox" in command or "close firefox" in command:
+            self.speak("Menutup Firefox")
+            subprocess.Popen(["taskkill", "/F", "/IM", "firefox.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup edge" in command or "close edge" in command:
+            self.speak("Menutup Microsoft Edge")
+            subprocess.Popen(["taskkill", "/F", "/IM", "msedge.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup antigravity" in command or "close antigravity" in command:
+            self.speak("Menutup Antigravity")
+            subprocess.Popen(["taskkill", "/F", "/IM", "Antigravity IDE.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "tutup snipping" in command or "close snipping" in command:
+            self.speak("Menutup Snipping Tool")
+            subprocess.Popen(["taskkill", "/F", "/IM", "SnippingTool.exe"], creationflags=subprocess.CREATE_NO_WINDOW)
 
         # ── Kontrol Jendela ──
 
@@ -450,6 +700,125 @@ class AyumiAssistant(tk.Tk):
             self.speak("Menutup semua aplikasi yang terbuka.")
             ps_cmd = 'Get-Process | Where-Object { $_.MainWindowHandle -ne 0 -and $_.ProcessName -notmatch "explorer|python|pythonw|cmd|conhost|WindowsTerminal" } | Stop-Process -Force'
             subprocess.Popen(["powershell", "-Command", ps_cmd], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        # ── Kontrol Kecerahan ──
+
+        elif "terangkan layar" in command or "naikkan kecerahan" in command or "brightness naik" in command or "lebih terang" in command:
+            self.speak("Menaikkan kecerahan layar")
+            ps_cmd = '(Get-WmiObject -Namespace root/wmi -Class WmiMonitorBrightnessMethods).WmiSetBrightness(1, [math]::Min(100, (Get-WmiObject -Namespace root/wmi -Class WmiMonitorBrightness).CurrentBrightness + 20))'
+            subprocess.Popen(["powershell", "-Command", ps_cmd], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "gelapkan layar" in command or "turunkan kecerahan" in command or "brightness turun" in command or "lebih gelap" in command:
+            self.speak("Menurunkan kecerahan layar")
+            ps_cmd = '(Get-WmiObject -Namespace root/wmi -Class WmiMonitorBrightnessMethods).WmiSetBrightness(1, [math]::Max(0, (Get-WmiObject -Namespace root/wmi -Class WmiMonitorBrightness).CurrentBrightness - 20))'
+            subprocess.Popen(["powershell", "-Command", ps_cmd], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        # ── Clipboard ──
+
+        elif "salin layar" in command or "copy screen" in command:
+            self.speak("Menyalin layar ke clipboard")
+            pyautogui.hotkey("win", "shift", "s")
+
+        elif "tempel" in command or "paste" in command:
+            self.speak("Menempelkan dari clipboard")
+            pyautogui.hotkey("ctrl", "v")
+
+        elif "salin" in command or "copy" in command:
+            self.speak("Menyalin")
+            pyautogui.hotkey("ctrl", "c")
+
+        elif "potong" in command or "cut" in command:
+            self.speak("Memotong")
+            pyautogui.hotkey("ctrl", "x")
+
+        elif "undo" in command or "batalkan" in command:
+            self.speak("Membatalkan")
+            pyautogui.hotkey("ctrl", "z")
+
+        elif "redo" in command or "ulangi" in command:
+            self.speak("Mengulangi")
+            pyautogui.hotkey("ctrl", "y")
+
+        # ── Tampilkan / Sembunyikan Desktop ──
+
+        elif "tampilkan desktop" in command or "show desktop" in command or "sembunyikan semua" in command:
+            self.speak("Menampilkan desktop")
+            pyautogui.hotkey("win", "d")
+
+        # ── Buka Recycle Bin / Kosongkan ──
+
+        elif "kosongkan tempat sampah" in command or "kosongkan recycle bin" in command:
+            self.speak("Mengosongkan Recycle Bin")
+            ps_cmd = 'Clear-RecycleBin -Force -ErrorAction SilentlyContinue'
+            subprocess.Popen(["powershell", "-Command", ps_cmd], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        # ── Wi-Fi ──
+
+        elif "matikan wifi" in command or "wifi off" in command or "nonaktifkan wifi" in command:
+            self.speak("Mematikan Wi-Fi")
+            subprocess.Popen(["netsh", "interface", "set", "interface", "Wi-Fi", "disable"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        elif "nyalakan wifi" in command or "wifi on" in command or "aktifkan wifi" in command:
+            self.speak("Menyalakan Wi-Fi")
+            subprocess.Popen(["netsh", "interface", "set", "interface", "Wi-Fi", "enable"], creationflags=subprocess.CREATE_NO_WINDOW)
+
+        # ── Bluetooth ──
+
+        elif "buka bluetooth" in command or "pengaturan bluetooth" in command:
+            self.speak("Membuka pengaturan Bluetooth")
+            subprocess.Popen("start ms-settings:bluetooth", shell=True)
+
+        # ── Notifikasi ──
+
+        elif "buka notifikasi" in command or "buka notification" in command:
+            self.speak("Membuka panel notifikasi")
+            pyautogui.hotkey("win", "n")
+
+        # ── Pilih Semua ──
+
+        elif "pilih semua" in command or "select all" in command:
+            self.speak("Memilih semua")
+            pyautogui.hotkey("ctrl", "a")
+
+        # ── Refresh ──
+
+        elif "refresh" in command or "muat ulang" in command or "segarkan" in command:
+            self.speak("Memuat ulang")
+            pyautogui.press("f5")
+
+        # ── Cari di halaman ──
+
+        elif "cari di halaman" in command or "find" in command:
+            self.speak("Membuka pencarian di halaman")
+            pyautogui.hotkey("ctrl", "f")
+
+        # ── Simpan ──
+
+        elif "simpan" in command or "save" in command:
+            self.speak("Menyimpan")
+            pyautogui.hotkey("ctrl", "s")
+
+        # ── Print ──
+
+        elif "cetak" in command or "print" in command:
+            self.speak("Membuka dialog cetak")
+            pyautogui.hotkey("ctrl", "p")
+
+        # ── Zoom ──
+
+        elif "zoom in" in command or "perbesar" in command:
+            self.speak("Memperbesar")
+            pyautogui.hotkey("ctrl", "+")
+
+        elif "zoom out" in command or "perkecil" in command:
+            self.speak("Memperkecil")
+            pyautogui.hotkey("ctrl", "-")
+
+        # ── Emoji ──
+
+        elif "buka emoji" in command or "emoji" in command:
+            self.speak("Membuka panel emoji")
+            pyautogui.hotkey("win", ".")
 
         # ── Screenshot ──
 
@@ -545,8 +914,9 @@ class AyumiAssistant(tk.Tk):
         elif "bantuan" in command or "help" in command or "bisa apa" in command:
             self.speak(
                 "Saya bisa membantu Anda dengan banyak hal. "
-                "Misalnya: buka aplikasi, cari di Google atau YouTube, putar video, "
-                "mengambil screenshot, mengontrol volume, "
+                "Misalnya: buka atau tutup aplikasi, cari di Google atau YouTube, putar video, "
+                "mengambil screenshot, mengontrol volume dan kecerahan, "
+                "mengatur Wi-Fi, clipboard, zoom, simpan, cetak, "
                 "memberitahu waktu dan tanggal, "
                 "atau sekadar mengobrol. "
                 "Awali setiap perintah dengan nama saya, Ayumi."

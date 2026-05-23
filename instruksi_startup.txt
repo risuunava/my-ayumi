@@ -1,0 +1,9 @@
+Cara Menjalankan AYUMI Saat Startup (Windows):
+
+1. Tekan tombol Windows + R di keyboard Anda untuk membuka jendela "Run" (Jalankan).
+2. Ketik `shell:startup` lalu tekan Enter. Ini akan membuka folder Startup bawaan Windows.
+3. Buka folder tempat Anda menyimpan proyek ini (misal di d:\Personal assistant).
+4. Klik kanan pada file `MulaiAyumi.bat` dan pilih "Copy" (Salin).
+5. Pergi ke folder Startup yang baru saja terbuka, klik kanan di tempat kosong, lalu pilih "Paste Shortcut" (Tempel Pintasan).
+   (Catatan: Pastikan Anda memilih Paste Shortcut, bukan Paste, agar sistem tetap merujuk ke lokasi folder asli).
+6. Selesai! Sekarang aplikasi AYUMI akan otomatis berjalan secara tersembunyi setiap kali Windows menyala.
